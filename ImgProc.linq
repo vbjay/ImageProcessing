@@ -1,10 +1,44 @@
 <Query Kind="VBProgram">
   <Reference>&lt;RuntimeDirectory&gt;\Microsoft.VisualBasic.dll</Reference>
   <Namespace>Microsoft.VisualBasic</Namespace>
+  <Namespace>System.Drawing</Namespace>
+  <Namespace>System.Drawing.Imaging</Namespace>
+  <Namespace>System.Runtime.InteropServices</Namespace>
 </Query>
 
 Sub Main
-	
+	Using bmp As Bitmap = Bitmap.FromFile(IO.Path.Combine(io.Path.GetDirectoryName(Util.CurrentQueryPath), "cat.jpg"))
+		Dim bmpData As BitmapData
+		Try
+			Dim rect As New Rectangle(0, 0, bmp.Width, bmp.Height)
+			bmpData = bmp.LockBits(rect,
+		   ImageLockMode.ReadWrite, bmp.PixelFormat)
+
+			' Get the address of the first line.
+			Dim ptr As IntPtr = bmpData.Scan0
+
+			' Declare an array to hold the bytes of the bitmap.
+			' This code is specific to a bitmap with 24 bits per pixels.
+			Dim bytes As Integer = Math.Abs(bmpData.Stride) * bmp.Height
+			Dim rgbValues(bytes - 1) As Byte
+
+			' Copy the RGB values into the array.
+			Marshal.Copy(ptr, rgbValues, 0, bytes)
+
+			'Do stuff here with rgbvalues to either edit or process
+
+			' Copy the RGB values back to the bitmap
+			System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes)
+		Catch
+		Finally
+			If bmpData IsNot Nothing Then bmp.UnlockBits(bmpData)
+
+		End Try
+
+	End Using
+
+
+
 End Sub
 
 	
