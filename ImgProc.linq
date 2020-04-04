@@ -41,20 +41,20 @@ Sub Main
 
 End Sub
 
-	
+
 
 '''<summary>Class to calculate 2D matrix statistics multi-threaded.</summary>
 '''<remarks>Calculation as for UInt16 is not possible as a vector with all entries would be 2^32 entries long.</remarks>
 Public Class StatMultiThread_UInt32
 
-    Private Const OneUInt64 As UInt64 = CType(1, UInt64)
+	Private Const OneUInt64 As UInt64 = CType(1, UInt64)
 
-    '''<summary>The real image data.</summary>
-    Public ImageData(,) As UInt32
+	'''<summary>The real image data.</summary>
+	Public ImageData(,) As UInt32
 
-    '''<summary>Object for each thread.</summary>
+	'''<summary>Object for each thread.</summary>
 	Public Class StateObj
-        Friend XOffset As Integer = -1
+		Friend XOffset As Integer = -1
 		Friend YOffset As Integer = -1
 		Friend HistDataBayer As New Collections.Generic.Dictionary(Of Int64, UInt64)
 		Friend Done As Boolean = False
