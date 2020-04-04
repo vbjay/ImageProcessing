@@ -45,7 +45,7 @@ End Sub
 
 '''<summary>Class to calculate 2D matrix statistics multi-threaded.</summary>
 '''<remarks>Calculation as for UInt16 is not possible as a vector with all entries would be 2^32 entries long.</remarks>
-Public Class cStatMultiThread_UInt32
+Public Class StatMultiThread_UInt32
 
     Private Const OneUInt64 As UInt64 = CType(1, UInt64)
 
@@ -53,7 +53,7 @@ Public Class cStatMultiThread_UInt32
     Public ImageData(,) As UInt32
 
     '''<summary>Object for each thread.</summary>
-    Public Class cStateObj
+	Public Class StateObj
         Friend XOffset As Integer = -1
 		Friend YOffset As Integer = -1
 		Friend HistDataBayer As New Collections.Generic.Dictionary(Of Int64, UInt64)
@@ -61,12 +61,12 @@ Public Class cStatMultiThread_UInt32
 	End Class
 
 	'''<summary>Perform a calculation with 4 threads, one for each bayer channel.</summary>
-	Public Sub Calculate(ByRef Results(,) As cStateObj)
+	Public Sub Calculate(ByRef Results(,) As StateObj)
 
 		'Data are processed
-		Dim StObj(3) As cStateObj
+		Dim StObj(3) As StateObj
 		For Idx As Integer = 0 To StObj.GetUpperBound(0)
-			StObj(Idx) = New cStateObj
+			StObj(Idx) = New StateObj
 		Next Idx
 		StObj(0).XOffset = 0 : StObj(0).YOffset = 0
 		StObj(1).XOffset = 0 : StObj(1).YOffset = 1
@@ -74,7 +74,7 @@ Public Class cStatMultiThread_UInt32
 		StObj(3).XOffset = 1 : StObj(3).YOffset = 1
 
 		'Start all threads
-		For Each Slice As cStateObj In StObj
+		For Each Slice As StateObj In StObj
 			System.Threading.ThreadPool.QueueUserWorkItem(New System.Threading.WaitCallback(AddressOf HistoCalc), Slice)
 		Next Slice
 
@@ -82,7 +82,7 @@ Public Class cStatMultiThread_UInt32
 		Do
 			'System.Threading.Thread.Sleep(1)
 			Dim AllDone As Boolean = True
-			For Each Slice As cStateObj In StObj
+			For Each Slice As StateObj In StObj
 				If Slice.Done = False Then
 					AllDone = False : Exit For
 				End If
@@ -102,7 +102,7 @@ Public Class cStatMultiThread_UInt32
 	'''<summary>Histogramm calculation itself - the histogram of one bayer channel is calculated.</summary>
 	Private Sub HistoCalc(ByVal Arguments As Object)
 
-		Dim StateObj As cStateObj = CType(Arguments, cStateObj)
+		Dim StateObj As StateObj = CType(Arguments, StateObj)
 		StateObj.Done = False
 
 		'Count one bayer part
