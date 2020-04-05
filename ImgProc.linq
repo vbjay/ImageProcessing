@@ -78,3 +78,39 @@ End Sub
 
 
 
+
+
+Public Shared Sub Test48BPP(ByVal FileName As String)
+	Dim b16bpp As New Bitmap(5000, 5000, System.Drawing.Imaging.PixelFormat.Format16bppGrayScale)
+
+	Dim rect As New Rectangle(0, 0, b16bpp.Width, b16bpp.Height)
+	Dim bitmapData As System.Drawing.Imaging.BitmapData = b16bpp.LockBits(rect, Imaging.ImageLockMode.WriteOnly, b16bpp.PixelFormat)
+	'Calculate the number of bytes required And allocate them.
+	Dim BytePerPixel As Integer = Image.GetPixelFormatSize(b16bpp.PixelFormat) \ 8
+
+	Dim bitmapBytes((b16bpp.Width * b16bpp.Height * BytePerPixel) - 1) As Byte
+	'Fill the bitmap bytes with random data.
+	Dim Rnd As New Random
+	Dim RunIdx As Long = 0
+	For x As Integer = 0 To b16bpp.Width - 1
+		For y As Integer = 0 To b16bpp.Height - 1
+			Dim PixelIdx As Integer = (y * b16bpp.Width * BytePerPixel) + (x * BytePerPixel)
+			Dim BitPatternR As Byte() = BitConverter.GetBytes(CType(Rnd.Next(0, UInt16.MaxValue + 1), UInt16))
+			Dim BitPatternG As Byte() = BitConverter.GetBytes(CType(Rnd.Next(0, UInt16.MaxValue + 1), UInt16))
+			Dim BitPatternB As Byte() = BitConverter.GetBytes(CType(Rnd.Next(0, UInt16.MaxValue + 1), UInt16))
+			bitmapBytes(PixelIdx + 0) = BitPatternR(0)
+			bitmapBytes(PixelIdx + 1) = BitPatternR(1)
+			bitmapBytes(PixelIdx + 2) = BitPatternG(0)
+			bitmapBytes(PixelIdx + 3) = BitPatternG(1)
+			bitmapBytes(PixelIdx + 4) = BitPatternB(0)
+			bitmapBytes(PixelIdx + 5) = BitPatternB(1)
+			RunIdx += 1
+		Next y
+	Next x
+	'Copy the randomized bits to the bitmap pointer.
+	Dim Pointer As IntPtr = bitmapData.Scan0
+	Runtime.InteropServices.Marshal.Copy(bitmapBytes, 0, Pointer, bitmapBytes.Length)
+	'Unlock the bitmap, we're all done.
+	b16bpp.UnlockBits(bitmapData)
+	b16bpp.Save(FileName, Imaging.ImageFormat.Png)
+End Sub
