@@ -173,25 +173,26 @@ Class FileProcessInfo
 	Function GetHistogramData() As task(Of HistogramInfo)
 		'Do stuff here with rgbvalues to either edit or process
 		'convert bytes to pixels
-		Return Task.Run(Function()
+		Return Task.Run(
+		Function()
 
-							Dim sw As New Stopwatch
-							sw.Start
-							Dim pixels = From pixel In bytes.Batch(PixelSize).AsParallel.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-										 Select BitConverter.ToUInt32(pixel.Concat(enumerable.range(0, 4 - pixel.Count).Select(Function(n) New Byte)).ToArray, 0)
-
-
-
-
-							Dim result = (From p In pixels
-										  Group By p Into HistG = Group
-										  Select New HistogramData With {.Pixel = p, .Count = HistG.LongCount}).ToArray
-
-							sw.Stop
-							Return New HistogramInfo With {.Time = sw.Elapsed, .Histogram = util.OnDemand("Click to see HistogramData", Function() result.OrderByDescending(Function(d) d.Count))}
+			Dim sw As New Stopwatch
+			sw.Start
+			Dim pixels = From pixel In bytes.Batch(PixelSize).AsParallel.WithExecutionMode(ParallelExecutionMode.ForceParallelism)
+						 Select BitConverter.ToUInt32(pixel.Concat(enumerable.range(0, 4 - pixel.Count).Select(Function(n) New Byte)).ToArray, 0)
 
 
-						End Function)
+
+
+			Dim result = (From p In pixels
+						  Group By p Into HistG = Group
+						  Select New HistogramData With {.Pixel = p, .Count = HistG.LongCount}).ToArray
+
+			sw.Stop
+			Return New HistogramInfo With {.Time = sw.Elapsed, .Histogram = util.OnDemand("Click to see HistogramData", Function() result.OrderByDescending(Function(d) d.Count))}
+
+
+		End Function)
 
 		'hist.Dump
 
