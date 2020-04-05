@@ -55,6 +55,8 @@ Sub Main
 
 				'hist.Dump
 
+				My.Computer.FileSystem.WriteAllText(IO.Path.Combine(IO.Path.GetDirectoryName(Util.CurrentQueryPath), "Hist.txt"),
+					String.Join(Environment.NewLine, hist.OrderByDescending(Function(h) h.Count).Select(Function(h) $"{h.Pixel}{vbTab}{h.Count}")), False)
 
 
 				' Copy the RGB values back to the bitmap
