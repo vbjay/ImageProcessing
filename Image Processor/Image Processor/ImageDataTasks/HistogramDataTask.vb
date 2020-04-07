@@ -11,7 +11,7 @@ Namespace ImageDataTasks
     Public Class HistogramDataTask
         Inherits ImageDataTask(Of IEnumerable(Of HistogramData), ImageFileProcessInfo)
         Sub New(ByVal Info As ImageFileProcessInfo, SourceFilePath As String)
-            MyBase.New(Info, $"Convert {NameOf(ImageFileProcessInfo)} to {NameOf(IEnumerable(Of HistogramData))}", SourceFilePath)
+            MyBase.New(Info, $"Convert {NameOf(ImageFileProcessInfo)} to {NameOf(HistogramData)}[]", SourceFilePath)
         End Sub
 
         Protected Overrides Iterator Function GenerateChildeSteps() As IEnumerable(Of ImageDataTask)

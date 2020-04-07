@@ -1,33 +1,45 @@
 ﻿Imports Image_Processor.ImageDataTasks
 Imports MoreLinq
+Imports Serilog
 Imports System.IO
 Imports System.Runtime.CompilerServices
 
 Module Module1
     Sub Main(args As String())
+        Log.Logger = New LoggerConfiguration().
+             MinimumLevel.Information.
+             WriteTo.File(IO.Path.Combine(My.Application.Info.DirectoryPath, "log.txt"), rollingInterval:=RollingInterval.Day, flushToDiskInterval:=TimeSpan.FromSeconds(3), [shared]:=True).
+             WriteTo().Console().
+             CreateLogger()
+
+
+
         Dim pth As String
         If args.Length = 0 Then
             pth = My.Application.Info.DirectoryPath
         Else
             pth = args(0)
         End If
+        Log.Information("Folder to search {pth}", pth)
         Dim extensions As String() = ".fts;.fits;.fit".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
         Dim files = Directory.GetFiles(pth).
                 Where(Function(f) extensions.Contains(Path.GetExtension(f).ToLower)).ToArray
 
         Dim sw As New Stopwatch
         sw.Start()
-        Dim allWorkTsk As Task(Of TimeSpan) = ProcessFiles(files)
+        Dim allWorkTsk As Task(Of WorkInfo) = ProcessFiles(files)
         allWorkTsk.Wait()
         sw.Stop()
         DisplayMemoryInfo()
         Dim allWork = allWorkTsk.Result
 
-        Console.WriteLine($"Work time:{allWork}")
-        Console.WriteLine($"Run time:{sw.Elapsed}")
-        Task.Delay(5000).Wait()
-        DisplayMemoryInfo()
-        Console.ReadKey()
+        Log.Information("Work time(Sum of all actual work time):{HowLong}", allWork.WorkTime)
+        Log.Information("Work Time by Task Type: {@Times}", allWork.Times)
+        Log.Information("Run time(Actual time took to run all work):{HowLong}", sw.Elapsed)
+        Log.Information("Time saved {Time}", allWork.WorkTime.Subtract(sw.Elapsed))
+
+
+
 
     End Sub
 
@@ -42,13 +54,22 @@ Module Module1
     End Function
 
     Private Sub DisplayMemoryInfo()
-        Console.WriteLine($"Current working set: {BytesToString(Environment.WorkingSet)}")
-        Console.WriteLine($"Current private bytes: {BytesToString(Process.GetCurrentProcess.PrivateMemorySize64)}")
+        Log.Information("Current working set: {Size}", BytesToString(Environment.WorkingSet))
+        Log.Information("Current private bytes: {Size}", BytesToString(Process.GetCurrentProcess.PrivateMemorySize64))
     End Sub
-
-    Private Async Function ProcessFiles(files() As String) As Task(Of TimeSpan)
+    Class WorkInfo
+        Property WorkTime As TimeSpan
+        Property Times As IEnumerable(Of TypeTime)
+    End Class
+    Class TypeTime
+        Property TaskType As Type
+        Property Time As TimeSpan
+    End Class
+    Private Async Function ProcessFiles(files() As String) As Task(Of WorkInfo)
         Return Await Task.Run(Async Function()
                                   Dim workTime As TimeSpan = TimeSpan.Zero
+                                  Dim timeByType As New Dictionary(Of Type, Long)
+
                                   For Each btch In files.Select(Function(fl) New FilePathDataTask(fl)).Batch(My.Settings.BatchSize)
                                       Dim infos As New List(Of ImageDataTaskInfo)
                                       Dim tsks = btch.Select(Function(t) t.Start).ToArray
@@ -60,10 +81,17 @@ Module Module1
                                           Dim otherInfos = Await WaitTasks(info.ChildTasks)
                                           infos.AddRange(otherInfos)
                                       Next
+
                                       For Each i In infos
                                           workTime += i.Time
-                                          Console.WriteLine($"{i.Description}-{i.Time}")
+                                          Dim tm As Long
+                                          timeByType.TryGetValue(i.TaskType, tm)
+                                          tm += i.Time.Ticks
+                                          timeByType(i.TaskType) = tm
+
+                                          Log.Information("Task finished: {Description}({ID})-{Time}- {Status}- {SourceFile}", i.Description, i.ID, i.Time, i.Status, i.SourceFilePath)
                                       Next
+
                                       infos.Clear()
                                       tsks = Array.Empty(Of Task(Of ImageDataTaskInfo))
 
@@ -71,7 +99,10 @@ Module Module1
 
                                   Next
 
-                                  Return workTime
+                                  Return New WorkInfo With {
+                                  .WorkTime = workTime,
+                                  .Times = timeByType.Select(Function(t) New TypeTime With {.TaskType = t.Key, .Time = TimeSpan.FromTicks(t.Value)}).ToArray
+                                  }
                               End Function)
     End Function
 

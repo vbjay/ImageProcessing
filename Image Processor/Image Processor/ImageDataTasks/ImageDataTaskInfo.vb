@@ -13,6 +13,7 @@
         Property SourceFilePath As String
         Property Status As ImageDataTaskStatus
         Property Time As TimeSpan = TimeSpan.Zero
+        Property TaskType As Type
 
     End Class
 

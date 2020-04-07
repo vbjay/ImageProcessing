@@ -14,7 +14,7 @@
         Dim _data As TData
 
         Sub New(Info As TData, Description As String, SourceFilePath As String)
-            TaskInfo = New ImageDataTaskInfo(Of TResult)(Description, SourceFilePath)
+            TaskInfo = New ImageDataTaskInfo(Of TResult)(Description, SourceFilePath) With {.TaskType = Me.GetType}
             Data = Info
 
         End Sub
