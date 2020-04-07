@@ -44,7 +44,7 @@ Module Module1
     End Sub
 
 
-    Private Function BytesToString(ByVal byteCount As Long) As String
+    Public Function BytesToString(ByVal byteCount As Long) As String
         Dim suf As String() = {"B", "KB", "MB", "GB", "TB", "PB", "EB"}
         If byteCount = 0 Then Return $"0{suf(0)}"
         Dim bytes As Long = Math.Abs(byteCount)

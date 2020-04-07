@@ -70,6 +70,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageDataTasks\FileInfoLogger.vb" />
     <Compile Include="ImageFileProcessors\BitmapImageInfoProcessor.vb" />
     <Compile Include="ImageFileProcessors\FileProcessor.vb" />
     <Compile Include="ImageFileProcessors\FileProcessorFactory.vb" />

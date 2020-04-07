@@ -8,6 +8,7 @@ Namespace ImageDataTasks
         End Sub
 
         Protected Overrides Iterator Function GenerateChildeSteps() As IEnumerable(Of ImageDataTask)
+            Yield New FileInfoLogger(TaskInfo.Result, TaskInfo.SourceFilePath)
             Yield New HistogramDataTask(TaskInfo.Result, TaskInfo.SourceFilePath)
         End Function
 
