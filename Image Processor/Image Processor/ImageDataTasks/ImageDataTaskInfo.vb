@@ -5,6 +5,7 @@
         Success
         Failed
     End Enum
+
     Public Class ImageDataTaskInfo
         Property ChildTasks As IEnumerable(Of ImageDataTask)
         Property Description As String
@@ -14,6 +15,7 @@
         Property Time As TimeSpan = TimeSpan.Zero
 
     End Class
+
     Public Class ImageDataTaskInfo(Of T)
         Inherits ImageDataTaskInfo
 

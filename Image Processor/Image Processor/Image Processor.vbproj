@@ -75,6 +75,9 @@
     <Compile Include="ImageFileProcessors\FileProcessorFactory.vb" />
     <Compile Include="ImageFileProcessors\FITSImageInfoRetriever.vb" />
     <Compile Include="ImageFileProcessors\ImageFileProcessInfo.vb" />
+    <Compile Include="ImageDataTasks\FilePathDataTask.vb" />
+    <Compile Include="ImageDataTasks\HistogramDataTask.vb" />
+    <Compile Include="ImageDataTasks\HistogramDataWriterTask.vb" />
     <Compile Include="ImageDataTasks\ImageDataTask.vb" />
     <Compile Include="ImageDataTasks\ImageDataTaskInfo.vb" />
     <Compile Include="Module1.vb" />
