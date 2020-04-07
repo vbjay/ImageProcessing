@@ -63,13 +63,28 @@ Module Module1
     End Class
     Class TypeTime
         Property TaskType As Type
-        Property Time As TimeSpan
+        Property Time As TypeTimeInfo
     End Class
+    Structure TypeTimeInfo
+        Property Ticks As Long
+        Property Count As Integer
+        ReadOnly Property AverageTaskTime As TimeSpan
+            Get
+                If Ticks = 0 Then Return TimeSpan.Zero
+                Return TimeSpan.FromTicks(Ticks \ Count)
+            End Get
+        End Property
+        ReadOnly Property Time As TimeSpan
+            Get
+                Return TimeSpan.FromTicks(Ticks)
+            End Get
+        End Property
+    End Structure
     Private Async Function ProcessFiles(files() As String) As Task(Of WorkInfo)
         Return Await Task.Run(Async Function()
                                   Dim workTime As TimeSpan = TimeSpan.Zero
-                                  Dim timeByType As New Dictionary(Of Type, Long)
-
+                                  Dim InfoByType As New Dictionary(Of Type, TypeTimeInfo)
+                                  Log.Information("Batch Size:{Size}", My.Settings.BatchSize)
                                   For Each btch In files.Select(Function(fl) New FilePathDataTask(fl)).Batch(My.Settings.BatchSize)
                                       Dim infos As New List(Of ImageDataTaskInfo)
                                       Dim tsks = btch.Select(Function(t) t.Start).ToArray
@@ -84,10 +99,11 @@ Module Module1
 
                                       For Each i In infos
                                           workTime += i.Time
-                                          Dim tm As Long
-                                          timeByType.TryGetValue(i.TaskType, tm)
-                                          tm += i.Time.Ticks
-                                          timeByType(i.TaskType) = tm
+                                          Dim tm As TypeTimeInfo
+                                          InfoByType.TryGetValue(i.TaskType, tm)
+                                          tm.Ticks += i.Time.Ticks
+                                          tm.Count += 1
+                                          InfoByType(i.TaskType) = tm
 
                                           Log.Information("Task finished: {Description}({ID})-{Time}- {Status}- {SourceFile}", i.Description, i.ID, i.Time, i.Status, i.SourceFilePath)
                                       Next
@@ -101,7 +117,7 @@ Module Module1
 
                                   Return New WorkInfo With {
                                   .WorkTime = workTime,
-                                  .Times = timeByType.Select(Function(t) New TypeTime With {.TaskType = t.Key, .Time = TimeSpan.FromTicks(t.Value)}).ToArray
+                                  .Times = InfoByType.Select(Function(t) New TypeTime With {.TaskType = t.Key, .Time = t.Value}).ToArray
                                   }
                               End Function)
     End Function
