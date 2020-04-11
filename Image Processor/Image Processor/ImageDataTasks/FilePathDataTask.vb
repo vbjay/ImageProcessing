@@ -22,5 +22,13 @@ Namespace ImageDataTasks
 
             End Get
         End Property
+        Protected Overrides Function TaskSucceded() As ImageDataTaskStatus
+            Dim status As ImageDataTaskStatus = ImageDataTaskStatus.Success
+            If TaskInfo.Result Is Nothing Then
+                status = ImageDataTaskStatus.Failed
+                ErrorMessage = "Could not retrieve info from file."
+            End If
+            Return status
+        End Function
     End Class
 End Namespace

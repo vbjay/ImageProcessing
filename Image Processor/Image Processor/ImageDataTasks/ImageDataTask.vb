@@ -1,6 +1,15 @@
-﻿Namespace ImageDataTasks
+﻿Imports Serilog
+
+Namespace ImageDataTasks
     Public MustInherit Class ImageDataTask
         Protected MustOverride Iterator Function GenerateChildeSteps() As IEnumerable(Of ImageDataTask)
+
+        Protected Overridable Function TaskSucceded() As ImageDataTaskStatus
+            ErrorMessage = ""
+            Return ImageDataTaskStatus.Success
+        End Function
+        Protected Property ErrorMessage
+
 
         Overridable Sub Cleanup()
 
@@ -52,8 +61,12 @@
             Try
                 Dim result As TResult = Await Process()
                 TaskInfo.Result = result
-                TaskInfo.Status = ImageDataTaskStatus.Success
-                TaskInfo.ChildTasks = GenerateChildeSteps().ToArray
+                TaskInfo.Status = TaskSucceded()
+                If (TaskInfo.Status = ImageDataTaskStatus.Success) Then
+                    TaskInfo.ChildTasks = GenerateChildeSteps().ToArray
+                Else
+                    TaskInfo.ChildTasks = Enumerable.Empty(Of ImageDataTask)
+                End If
             Catch ex As Exception
                 TaskInfo.Result = Nothing
                 TaskInfo.Status = ImageDataTaskStatus.Failed
