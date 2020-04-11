@@ -25,7 +25,7 @@ Module Module1
             pth = args(0)
         End If
         Log.Information("Folder to search {pth}", pth)
-        Dim extensions As String() = ".fts;.fits;.fit".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
+        Dim extensions As String() = ".fts;.fits;.fit;.tif".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
         Dim files = Directory.GetFiles(pth).
                 Where(Function(f) extensions.Contains(Path.GetExtension(f).ToLower)).ToArray
 

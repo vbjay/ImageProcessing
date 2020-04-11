@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports Serilog
 
 Namespace ImageFileProcessors
     Public Class FileProcessorFactory
@@ -12,7 +13,7 @@ Namespace ImageFileProcessors
             ext = ext.Trim(".").ToLower
             Dim proc As FileProcessor(Of ImageFileProcessInfo) = Nothing
             Select Case ext
-                Case "fit", "fits", "fts"
+                Case "fit", "fits", "fts", "tif"
                     proc = New AccordImageInfoRetriever(FilePath)
             End Select
             Log.Debug("Used {type} to process the file- {file}", proc.GetType.FullName, FilePath)
