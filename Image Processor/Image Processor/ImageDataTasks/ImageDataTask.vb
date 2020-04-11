@@ -59,6 +59,7 @@
                 TaskInfo.Status = ImageDataTaskStatus.Failed
                 TaskInfo.Description = $"{TaskInfo.Description}-{ex.Message}"
                 TaskInfo.ChildTasks = Enumerable.Empty(Of ImageDataTask)
+                Log.Error(ex, "Task failed: {Description}({ID})-{Time}- {Status}- {SourceFile}", TaskInfo.Description, TaskInfo.ID, TaskInfo.Time, TaskInfo.Status, TaskInfo.SourceFilePath)
             Finally
                 sw.Stop()
                 TaskInfo.Time = sw.Elapsed
