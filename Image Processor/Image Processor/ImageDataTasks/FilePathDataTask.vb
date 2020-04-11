@@ -22,7 +22,7 @@ Namespace ImageDataTasks
 
             End Get
         End Property
-        Protected Overrides Function TaskSucceded() As ImageDataTaskStatus
+        Protected Overrides Function GetTaskStatus() As ImageDataTaskStatus
             Dim status As ImageDataTaskStatus = ImageDataTaskStatus.Success
             If TaskInfo.Result Is Nothing Then
                 status = ImageDataTaskStatus.Failed

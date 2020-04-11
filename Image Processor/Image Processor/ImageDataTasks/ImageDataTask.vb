@@ -4,7 +4,7 @@ Namespace ImageDataTasks
     Public MustInherit Class ImageDataTask
         Protected MustOverride Iterator Function GenerateChildeSteps() As IEnumerable(Of ImageDataTask)
 
-        Protected Overridable Function TaskSucceded() As ImageDataTaskStatus
+        Protected Overridable Function GetTaskStatus() As ImageDataTaskStatus
             ErrorMessage = ""
             Return ImageDataTaskStatus.Success
         End Function
@@ -62,7 +62,7 @@ Namespace ImageDataTasks
             Try
                 Dim result As TResult = Await Process()
                 TaskInfo.Result = result
-                TaskInfo.Status = TaskSucceded()
+                TaskInfo.Status = GetTaskStatus()
                 If (TaskInfo.Status = ImageDataTaskStatus.Success) Then
                     TaskInfo.ChildTasks = GenerateChildeSteps().ToArray
                 Else
