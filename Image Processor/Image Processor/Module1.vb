@@ -7,9 +7,13 @@ Imports System.Runtime.CompilerServices
 Module Module1
     Sub Main(args As String())
         Log.Logger = New LoggerConfiguration().
-             MinimumLevel.Information.
-             WriteTo.File(IO.Path.Combine(My.Application.Info.DirectoryPath, "log.txt"), rollingInterval:=RollingInterval.Day, flushToDiskInterval:=TimeSpan.FromSeconds(3), [shared]:=True).
-             WriteTo().Console().
+             MinimumLevel.Verbose.
+             WriteTo.File(
+                    Path.Combine(My.Application.Info.DirectoryPath, "log.txt"),
+                    rollingInterval:=RollingInterval.Day,
+                    flushToDiskInterval:=TimeSpan.FromSeconds(3),
+                    [shared]:=True).
+             WriteTo().Console(restrictedToMinimumLevel:=Events.LogEventLevel.Information).
              CreateLogger()
 
 
@@ -86,6 +90,10 @@ Module Module1
                                   Dim InfoByType As New Dictionary(Of Type, TypeTimeInfo)
                                   Log.Information("Batch Size:{Size}", My.Settings.BatchSize)
                                   For Each btch In files.Select(Function(fl) New FilePathDataTask(fl)).Batch(My.Settings.BatchSize)
+                                      Dim sw As New Stopwatch
+                                      Dim id As Guid = Guid.NewGuid
+                                      Log.Debug("Batch Start {id}-{count} tasks", id, btch.Count)
+                                      sw.Start()
                                       Dim infos As New List(Of ImageDataTaskInfo)
                                       Dim tsks = btch.Select(Function(t) t.Start).ToArray
                                       Task.WaitAll(tsks)
@@ -113,6 +121,8 @@ Module Module1
 
                                       DisplayMemoryInfo()
 
+                                      sw.Stop()
+                                      Log.Debug("Batch End {id}-{time} tasks", id, sw.Elapsed)
                                   Next
 
                                   Return New WorkInfo With {
@@ -123,9 +133,14 @@ Module Module1
     End Function
 
     Sub DoCleanup(tasks As IEnumerable(Of ImageDataTask))
+        Dim sw As New Stopwatch
+        Log.Debug("Cleaning up batch data")
+        sw.Start()
         For Each tsk In tasks
             tsk.Cleanup()
         Next
+        sw.Stop()
+        Log.Debug("Completed cleaning up batch data {time}", sw.Elapsed)
     End Sub
 
 

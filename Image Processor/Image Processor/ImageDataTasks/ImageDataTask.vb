@@ -56,6 +56,7 @@ Namespace ImageDataTasks
         Overrides Async Function Start() As Task(Of ImageDataTaskInfo)
             If TaskInfo.Status <> ImageDataTaskStatus.NotStarted Then Await Task.CompletedTask
             Dim sw As New Stopwatch
+            Log.Debug("Task Start {id}-{description}", TaskInfo.ID, TaskInfo.Description)
             sw.Start()
             TaskInfo.Status = ImageDataTaskStatus.Running
             Try
@@ -75,6 +76,7 @@ Namespace ImageDataTasks
                 Log.Error(ex, "Task failed: {Description}({ID})-{Time}- {Status}- {SourceFile}", TaskInfo.Description, TaskInfo.ID, TaskInfo.Time, TaskInfo.Status, TaskInfo.SourceFilePath)
             Finally
                 sw.Stop()
+                Log.Debug("Task End {id}-{description}- {time}", TaskInfo.ID, TaskInfo.Description, sw.Elapsed)
                 TaskInfo.Time = sw.Elapsed
             End Try
             Return TaskInfo

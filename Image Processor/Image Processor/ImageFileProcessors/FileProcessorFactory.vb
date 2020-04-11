@@ -15,6 +15,7 @@ Namespace ImageFileProcessors
                 Case "fit", "fits", "fts"
                     proc = New FITSImageInfoRetriever(FilePath)
             End Select
+            Log.Debug("Used {type} to process the file- {file}", proc.GetType.FullName, FilePath)
             Return proc
         End Function
 
