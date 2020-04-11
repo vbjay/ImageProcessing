@@ -44,7 +44,9 @@ Namespace ImageFileProcessors
         End Function
 
         Overrides Function Process() As ImageFileProcessInfo
-            Throw New NotImplementedException()
+            Using bmp = Bitmap.FromFile(FilePath)
+                Return GetBitmapInfo(bmp)
+            End Using
         End Function
     End Class
 End Namespace
