@@ -26,7 +26,7 @@ Module Module1
         End If
         Log.Information("Code version:{hash}", ThisAssembly.Git.Sha)
         Log.Information("Folder to search {pth}", pth)
-        Dim extensions As String() = ".fts;.fits;.fit;.tif".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
+        Dim extensions As String() = ".bmp;.fit;.fits;.tif;.tiff;.jpg;.jpeg;.png;.pbm;.pgm;.pnm;.ppm;.gif".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
         Dim files = Directory.GetFiles(pth).
                 Where(Function(f) extensions.Contains(Path.GetExtension(f).ToLower)).ToArray
 

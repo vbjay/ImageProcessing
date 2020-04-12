@@ -13,7 +13,7 @@ Namespace ImageFileProcessors
             ext = ext.Trim(".").ToLower
             Dim proc As FileProcessor(Of ImageFileProcessInfo) = Nothing
             Select Case ext
-                Case "fit", "fits", "fts", "tif"
+                Case "bmp", "fit", "fits", "tif", "tiff", "jpg", "jpeg", "png", "pbm", "pgm", "pnm", "ppm", "gif"
                     proc = New AccordImageInfoRetriever(FilePath)
             End Select
             Log.Debug("Used {type} to process the file- {file}", proc.GetType.FullName, FilePath)
