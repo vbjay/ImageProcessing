@@ -26,6 +26,10 @@ Module Module1
             pth = args(0)
         End If
         Log.Information("Code version:{hash}", ThisAssembly.Git.Sha)
+        If pth.Replace("/", "").Replace("-", "").Trim = "?" Then
+            Usage()
+            Environment.Exit(0)
+        End If
         If args.Length = 2 Then
             If Not Integer.TryParse(args(1), batchSize) Then
                 Log.Error("Batch Size must be a positive whole number.  Unable to parse Batch Size from ""{arg}""", args(1))
@@ -55,6 +59,17 @@ Module Module1
 
     End Sub
 
+    Private Sub Usage()
+        Console.WriteLine($"Run with the following arguments: [Path to folder to process] [ Batch Size]
+Path To Folder: Required to process Batch Size.  Will default to folder where deployed
+Batch Size: defaults to value in config file
+
+examples:
+ImageProcessor
+ImageProcessor ""C:\Images""
+ImageProcessor ""C:\Images"" 2
+")
+    End Sub
 
     Public Function BytesToString(ByVal byteCount As Long) As String
         Dim suf As String() = {"B", "KB", "MB", "GB", "TB", "PB", "EB"}
