@@ -1,5 +1,10 @@
-# FITS Histogram Data Generator
+# Extensible Image Processing Framwork
 
-So some of the slowdown is linqpad stuff and the fact I am using util.ondemand and such.  Read the code for underatanding on how it works.  I did not include error handling for the tasks.  You should make sure the tasks have exception handling.
+## Resources Used
 
-Notice the time savings.  See how I total all work times together and then show how long it took to process.  Play with the batchsize variable.
+- [Accord.NET](http://accord-framework.net/index.html): Great imaging library that can provide the launch platform of analyzing the images using machine learning if desired.
+
+## Reason Created
+
+I am a member of a VB.Net group and a member wanted help with his image processing of Astronomy pictures.  He is taking pictures of some cool things.  I developed this as a platform for him to process various images.  He had some beginnings of things but I felt he needed a stronger OOP designed way of handling it.  
+
