@@ -24,6 +24,7 @@ Module Module1
         Else
             pth = args(0)
         End If
+        Log.Information("Code version:{hash} Dirty? {dirty}", ThisAssembly.Git.Sha, ThisAssembly.Git.IsDirty)
         Log.Information("Folder to search {pth}", pth)
         Dim extensions As String() = ".fts;.fits;.fit;.tif".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
         Dim files = Directory.GetFiles(pth).
