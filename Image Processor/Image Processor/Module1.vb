@@ -17,7 +17,7 @@ Module Module1
              WriteTo().Console(restrictedToMinimumLevel:=Events.LogEventLevel.Information).
              CreateLogger()
 
-
+        Log.Information("Code version:{hash}", ThisAssembly.Git.Sha)
 
         Dim pth As String
         If args.Length = 0 Then
@@ -25,7 +25,6 @@ Module Module1
         Else
             pth = args(0)
         End If
-        Log.Information("Code version:{hash}", ThisAssembly.Git.Sha)
         If pth.Replace("/", "").Replace("-", "").Trim = "?" Then
             Usage()
             Environment.Exit(0)
@@ -36,6 +35,7 @@ Module Module1
                 Environment.Exit(0)
             End If
         End If
+
         Log.Information("Folder to search {pth}", pth)
         Dim extensions As String() = ".bmp;.fit;.fits;.tif;.tiff;.jpg;.jpeg;.png;.pbm;.pgm;.pnm;.ppm;.gif".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
         Dim files = Directory.GetFiles(pth).
