@@ -10,7 +10,7 @@ Namespace ImageDataTasks
         Protected Overrides ReadOnly Property Work As Func(Of ImageFileProcessInfo, Integer)
             Get
                 Return Function(info)
-                           Log.Information("File size: {size}- {file}", BytesToString(info.ByteCount), TaskInfo.SourceFilePath)
+                           Log.Information("File size: {size} Pixel Format: {format} Bits Per Pixel:{bpp}- {file}", BytesToString(info.ByteCount), info.Format, info.BitSize, TaskInfo.SourceFilePath)
                            Return 0
                        End Function
             End Get
