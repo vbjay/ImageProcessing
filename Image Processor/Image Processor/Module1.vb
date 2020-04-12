@@ -5,6 +5,7 @@ Imports System.IO
 Imports System.Runtime.CompilerServices
 
 Module Module1
+    Dim batchSize As Integer = My.Settings.BatchSize
     Sub Main(args As String())
         Log.Logger = New LoggerConfiguration().
              MinimumLevel.Verbose.
@@ -25,6 +26,12 @@ Module Module1
             pth = args(0)
         End If
         Log.Information("Code version:{hash}", ThisAssembly.Git.Sha)
+        If args.Length = 2 Then
+            If Not Integer.TryParse(args(1), batchSize) Then
+                Log.Error("Batch Size must be a positive whole number.  Unable to parse Batch Size from ""{arg}""", args(1))
+                Environment.Exit(0)
+            End If
+        End If
         Log.Information("Folder to search {pth}", pth)
         Dim extensions As String() = ".bmp;.fit;.fits;.tif;.tiff;.jpg;.jpeg;.png;.pbm;.pgm;.pnm;.ppm;.gif".Split(";".ToCharArray) 'adjust to add any other file extensions that can be processed
         Dim files = Directory.GetFiles(pth).
@@ -89,8 +96,8 @@ Module Module1
         Return Await Task.Run(Async Function()
                                   Dim workTime As TimeSpan = TimeSpan.Zero
                                   Dim InfoByType As New Dictionary(Of Type, TypeTimeInfo)
-                                  Log.Information("Batch Size:{Size}", My.Settings.BatchSize)
-                                  For Each btch In files.Select(Function(fl) New FilePathDataTask(fl)).Batch(My.Settings.BatchSize)
+                                  Log.Information("Batch Size:{Size}", batchSize)
+                                  For Each btch In files.Select(Function(fl) New FilePathDataTask(fl)).Batch(batchSize)
                                       Dim sw As New Stopwatch
                                       Dim id As Guid = Guid.NewGuid
                                       Log.Debug("Batch Start {id}-{count} tasks", id, btch.Count)
