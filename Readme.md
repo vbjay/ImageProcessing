@@ -1,4 +1,4 @@
-# Extensible Image Processing Framwork
+# Extensible Image Processing Framework
 
 ## Resources Used
 
